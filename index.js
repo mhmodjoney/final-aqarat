@@ -1,11 +1,12 @@
 const express = require('express');
 const app = express();
-const realEstateRoutes = require('./routes/realEstateRoutes');
+const realEstateRoutes = require('./routes/masterRoutes');
+const PORT=process.env.PORT
 
 app.use(express.json());
 
 app.use('/api', realEstateRoutes);
 
-app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
