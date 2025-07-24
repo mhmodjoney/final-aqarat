@@ -1,0 +1,26 @@
+DELIMITER $$
+
+CREATE PROCEDURE sp_update_user(
+    IN p_userId INT,
+    IN p_email VARCHAR(255),
+    IN p_password VARCHAR(255),
+    IN p_userName VARCHAR(100),
+    IN p_fullName VARCHAR(255),
+    IN p_phoneNum VARCHAR(20),
+    IN p_whatsappNum VARCHAR(20),
+    IN p_type VARCHAR(50)
+)
+BEGIN
+    UPDATE user
+    SET
+        email = COALESCE(p_email, email),
+        password = COALESCE(p_password, password),
+        userName = COALESCE(p_userName, userName),
+        fullName = COALESCE(p_fullName, fullName),
+        phoneNum = COALESCE(p_phoneNum, phoneNum),
+        whatsappNum = COALESCE(p_whatsappNum, whatsappNum),
+        type = COALESCE(p_type, type)
+    WHERE user_id = p_userId;
+END$$
+
+DELIMITER ;

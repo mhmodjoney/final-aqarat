@@ -1,0 +1,10 @@
+DELIMITER $$
+
+CREATE PROCEDURE sp_delete_user(
+    IN p_userId INT
+)
+BEGIN
+    DELETE FROM user WHERE user_id = p_userId;
+END$$
+
+DELIMITER ;
