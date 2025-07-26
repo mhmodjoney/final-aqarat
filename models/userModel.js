@@ -42,7 +42,7 @@ exports.getUserByEmail = async (email) => {
     [email]
   );
   // Assuming the stored procedure returns user info in the first row
-  return rows[0][0];
+  return rows;
 };
 
 // GET USER BY ID (optional, for profile)
