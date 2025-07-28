@@ -5,8 +5,8 @@ const authRout =require('./authRout')
 const favRout =require('./favRout')
 const userRout =require('./userRout')
 // this is a master Rout file to sapret other routes 
-router.post('/realestate', realEstateController.getAllRealEstate);
-router.post('/auth',authRout);
-router.post('/fav',favRout);
-router.post('./userRout',userRout);
+router.use('/realestate', realEstateController.getAllRealEstate);
+router.use('/auth',authRout);
+router.use('/fav',favRout);
+router.use('./userRout',userRout);
 module.exports = router;
