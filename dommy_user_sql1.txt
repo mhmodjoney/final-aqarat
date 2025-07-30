@@ -1,14 +1,9 @@
-p_action VARCHAR(10),
-p_user_id INT,
-p_full_name VARCHAR(100),
-p_phone_number VARCHAR(20),
-p_whatsapp_number VARCHAR(20),
-p_email VARCHAR(100),
-p_user_name VARCHAR(50),
-p_password VARCHAR(255),
-p_type VARCHAR(50),
-p_state VARCHAR(50),
-p_created_by VARCHAR(50),
-p_last_updated_by VARCHAR(50),
-p_created_date DATETIME,
-p_updated_date DATETIME
+{
+  "fullName": "John Doe",
+  "userName": "username22",
+  "password": "password2",
+  "phoneNum": "01234567890",
+  "whatsappNum": "01234567890",
+  "email": "john.doedn@example2.com",
+  "type": "user"
+}

@@ -30,7 +30,7 @@ exports.getRealEstate = async (filters) => {
     [real_estate_id, min_price, max_price, currency, city, region, type, purpose, sort_column, sort_order]
   );
 
-  console.log(   'CALL sp_get_real_estate(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [real_estate_id, min_price, max_price, currency, city, region, type, purpose, sort_column, sort_order])
+  // console.log(   'CALL sp_get_real_estate(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+  //   [real_estate_id, min_price, max_price, currency, city, region, type, purpose, sort_column, sort_order])
   return rows[0];
 };
