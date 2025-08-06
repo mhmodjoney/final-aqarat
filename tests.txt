@@ -1,0 +1,42 @@
+# /api/auth/register - Valid Registration Example 1
+{
+  "fullName": "Alice Smith",
+  "userName": "alice_smith",
+  "password": "StrongPass123",
+  "phoneNum": "0912345678",
+  "email": "alice@example.com",
+  "type": "user",
+  "whatsappNum": "0998765432"
+}
+
+# /api/auth/register - Valid Registration Example 2
+{
+  "fullName": "Bob Jones",
+  "userName": "bobjones",
+  "password": "AnotherPass456",
+  "phoneNum": "0999999999",
+  "email": "bob.jones@example.com",
+  "type": "admin"
+}
+
+# /api/auth/register - Invalid Registration Example (fails validation)
+{
+  "fullName": "Al",
+  "userName": "bob!@#",
+  "password": "123",
+  "phoneNum": "0812345678",
+  "email": "not-an-email",
+  "type": "superuser",
+  "whatsappNum": "12345"
+}
+
+# /api/auth/login - Valid Login Example
+{
+  "email": "alice@example.com",
+  "password": "StrongPass123"
+}
+
+# /api/auth/login - Invalid Login Example (missing password)
+{
+  "email": "bob.jones@example.com"
+} 

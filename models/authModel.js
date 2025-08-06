@@ -47,15 +47,15 @@ exports.getUserByEmail = async (fields) => {
   const [rows] = await pool.query(
     
     'CALL sp_crud_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-    ['email',null, null, null, null, p_email,null, null, null, null, null, null, null, null]
+    ['email',null, null, null, null,fields.email,null, null, null, null, null, null, null, null]
   );
   return rows[0][0];
 };
 
 exports.getUserByUsername = async (fields) => {
   const [rows] = await pool.query(
-    'CALL sp_get_user_by_user_name(?)',
-    [fields.username]
+    'CALL sp_crud_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+    ["user_name",null,null,null,null,null,fields.user_name,null,null,null,null,null,null,null]
   );
   return rows[0][0];
 };
@@ -66,5 +66,13 @@ exports.login=async(fields)=>{
     ["login",null,null,null,null,fields.email,null,null,null,null,null,null,null,null]
   );
   // console.log(rows);
+  return rows[0][0];
+};
+
+exports.getUserById=async(fields)=>{
+  const[rows]=await pool.query(
+    'CALL sp_crud_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+    ["user_id",fields.user_id,null,null,null,null,null,null,null,null,null,null,null,null]
+  );
   return rows[0][0];
 };
