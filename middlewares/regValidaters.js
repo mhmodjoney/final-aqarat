@@ -84,6 +84,18 @@ const loginSchema = Joi.object({
     })
 });
 
+// Verify OTP schema
+const verifyOtpSchema = Joi.object({
+  email: Joi.string().email().required().messages({
+    'string.email': 'يرجى إدخال بريد إلكتروني صحيح',
+    'any.required': 'البريد الإلكتروني مطلوب'
+  }),
+  otp_code: Joi.string().pattern(/^\d{6}$/).required().messages({
+    'string.pattern.base': 'رمز التحقق يجب أن يكون 6 أرقام',
+    'any.required': 'رمز التحقق مطلوب'
+  })
+});
+
 // Reusable validation middleware
 const validateRequest = (schema) => {
   return (req, res, next) => {
@@ -109,5 +121,6 @@ const validateRequest = (schema) => {
 module.exports = {
   registrationSchema,
   loginSchema,
+  verifyOtpSchema,
   validateRequest
 };
