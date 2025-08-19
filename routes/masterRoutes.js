@@ -8,5 +8,5 @@ const userRout =require('./userRout')
 // router.use('/realestate', realEstateController.getAllRealEstate);
 router.use('/auth',authRout);
 // router.use('/fav',favRout);
-// router.use('./userRout',userRout);
+router.use('/user',userRout);
 module.exports = router;

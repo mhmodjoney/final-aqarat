@@ -3,110 +3,153 @@ const jwt =require('jsonwebtoken')
 const bcrypt=require('bcrypt');
 const {sendOtpEmail}=require('../utils/mailer');
 
+function getUserIdFromToken(req) {
+    // 1. Get the token from the Authorization header
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return null;
+    
+    // 2. Remove "Bearer " if present
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+    
+    try {
+        // console.log(token)
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      return decoded.id;
+    } catch (err) {
+      return null;
+    }
+};
+
 exports.create = async(req,res )=>{
-    console.log(req.body);
     console.log('create');
     try{
-        const {fullName,userName,password,phoneNum,whatsappNum,email,type,otp_code}=req.body;
+        const {userName,password,phoneNum,email}=req.body;
         // console.log({fullName,userName,password,phoneNum,whatsappNum,email,type});
         const hashed =await bcrypt.hash(password,10);
-        let user=await authModel.create({email:email,password:hashed,user_name:userName,full_name:fullName,phone_number:phoneNum,whatsapp_number:whatsappNum,type:type,created_by:userName,otp_code:otp_code});
+        let user=await authModel.create({email:email,password:hashed,user_name:userName,phone_number:phoneNum});
         // console.log(user.resault);
         if(user.resault=='email'){
-            return res.status(400).json({message:"البريد الإلكتروني مستخدم بالفعل، حاول تسجيل الدخول"});
-        }else if(user.resault=='user_name'){
-            return res.status(400).json({message:"اسم المستخدم مستخدم بالفعل"});
-        }else if(user.resault=='phone_number'){
-            return res.status(400).json({message:"رقم الهاتف مستخدم بالفعل، حاول تسجيل الدخول"});
-        }else if(Number.isInteger(user.user_id)){
-            console.log(user);
-            try{
-                await sendOtpEmail({to:email,otpCode:otp_code});
-            }catch(sendErr){
-                console.log({message:'email send error',err:sendErr});
-            };
-            return res.status(201).json({message:'تم إنشاء المستخدم وتبقى تفعيله فقط',data:{user:user}})
-        }else{
-            return res.status(500).json({message:"خطأ في الخادم",data:{err:err}})    
+            return res.status(400).json({message:"EMAIL_EXIST"});
         }
+        if(user.resault=='user_name'){
+            return res.status(400).json({message:"USERNAME_EXISTS"});
+        }
+        if(user.resault=='phone_number'){
+            return res.status(400).json({message:"PHONE_EXISTS"});
+        }
+        
+        delete user.password;
+        delete user.otp_code;
+        delete user.otp_expires_at;
+        const token =jwt.sign({id:user.user_id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRESIN || '1d'})
+        return res.status(201).json({message:'ACC_CREATED',data:{user:user,token:token}});
+        
     }catch(err){
-        return res.status(500).json({message:"خطأ في الخادم",data:{err:err}})
+        return res.status(500).json({message:"SERVER_ERROR",data:{err:err}})    
     };
 
 };
 
 exports.login = async (req,res)=>{
-    console.log(req.body);
     console.log('login');
     try{
         const {email,password}=req.body;
-        const hashed=await bcrypt.hash(password,10);
-        // console.log(email);
-        // console.log(hashed);
         let user= await authModel.login({email:email})
-        // console.log(user);
         
-        if(!user){
-            // console.log("!user.resault")
-            return res.status(401).json({message:"البيانات المدخلة غير صحيحة"});    
+        if(user.resault=="email"){
+            return res.status(401).json({message:"INCORRECT_DATA"});    
         }
         const isMach = await bcrypt.compare(password,user.password);
         if(!isMach){
-            return res.status(401).json({message:"البيانات المدخلة غير صحيحة"});        
+            return res.status(401).json({message:"INCORRECT_DATA"});        
         }
-        else if (user.state=="inactiv"){
-            return res.status(401).json({message:"هذا الحساب محذوف تواصل مع الدعم لاسترجاعه"});
-        }
-        else if (user.state=="inactivated"){
-            return res.status(401).json({message:"قم بتفعيل حسابك لتتمكن من تسجيل الدخول"});
-        }
-        else if(user.state=="deleted"){
-            return res.status(401).json({message:"الحساب غير مفعل قم بتفعيله اولا ثم اعد المحاولة"});
+        else if (user.state=="deleted"){
+            return res.status(401).json({message:"DELETED_ACC"});
         }
         else if(user.state=="banned"){
-            return res.status(401).json({message:"الحساب محظور تواصل مع الدعم"});
+            return res.status(401).json({message:"BANNED_ACC"});
         }
-        else if(user.state=="activated"){
+        else if (user.state=="activated"||user.state=="inactivated"){
             delete user.password;
+            delete user.otp_code;
+            delete user.otp_expires_at;
             const token =jwt.sign({id:user.user_id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRESIN || '1d'})
-            console.log(user);
-            return res.status(200).json({message:"تم تسجيل الدخول بنجاح",data:{token:token,user:user}});
+            return res.status(200).json({message:"LOGED_IN",data:{user:user,token:token}});
         }
         else{
-            return res.status(201).json({message:"خطأ في حسابك تواصل مع الدعم"});
+            return res.status(201).json({message:"ACC_ERROR"});
         }
     } catch(err){
-        res.status(500).json({err:"خطأ في الخادم",data:{errMessage:err}})
+        return res.status(500).json({err:"SERVER_ERROR",data:{errMessage:err}})
     };
 };
 
 exports.logout = async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     console.log('logout');
-    return res.status(200).json({ message: "تم تسجيل الخروج بنجاح. يرجى حذف الرمز المميز من جانب العميل." });
+
+    return res.status(200).json({ message: "LOGED_OUT" });
 };
-//dummy otpVerification for now 
+
 exports.otpVerification = async(req,res)=>{
-  try{
-    const {email,otp_code}=req.body;
-    let user=await authModel.verifyOtpByEmail({email:email,otp_code:otp_code});
-    if(!user){
-      return res.status(404).json({message:'المستخدم غير موجود'});
-    }
-    if(user.wrong){
-      return res.status(401).json({message:'كود التفعيل المدخل خاطئ يرجى التأكد منه'});
-    }
-    if(user.expired){
-      return res.status(400).json({message:'كود التفعيل منتهي الصلاحية قم بطلب كود اخر'});
-    }
-    else{
+    console.log('verify');
+    
+    try{
+        const {otp_code}=req.body;
+        const user_id=getUserIdFromToken(req);
+        if(!user_id){
+            return res.status(401).json({message:'UNAUTHORIZED'});
+        };
+        let user= await authModel.verifyOtpById({user_id:user_id,otp_code:otp_code});
+        if(user.resault=="user_id"){
+            return res.status(404).json({message:'NO_USER'});
+        }
+        if(user.resault=="wrong"){
+            return res.status(401).json({message:'INCORRECT_OTP'});
+        }
+        if(user.resault=="expired"){
+            return res.status(400).json({message:'EXPIRED_OTP'});
+        }
+        if(user.resault=="already_act"){
+            return res.status(400).json({message:'ALREADY_ACT'});
+        }
         delete user.password;
-        const token =jwt.sign({userId:user.resault},process.env.JWT_SECRET,{ expiresIn: process.env.JWT_EXPIRESIN || '1d' });
-        console.log(user);
-        // REEEEED SECURETY ALLERT THIS IS WRONG ASK HOW TO SOLVE IT (THE API IS OPEN AND MAKE YOU LOGED IN EVEN IF YOU DONT KNOW THE PASSWORD OF THE ACCOUNT) 
-        return res.status(201).json({message:'تم تفعيل الحساب وتسجيل الدخول بنجاح',data:{token:token,user:user}});
+        delete user.otp_code;
+        delete user.otp_expires_at;
+        return res.status(201).json({message:'ACTIVATED_ACC',data:{user:user}});
+
+    }catch(err){
+        return res.status(500).json({message:'SERVER_ERROR',data:{err:err}});
     }
-  }catch(err){
-    return res.status(500).json({message:'خطأ في الخادم',data:{err:err}});
-  }
+};
+
+exports.setOtp = async(req,res)=>{
+    console.log('set OTP');
+    try{
+        const{otp_code}=req.body;
+        const user_id=getUserIdFromToken(req);
+        if(!user_id){
+            return res.status(401).json({message:'UNAUTHORIZED'});
+        }
+        const isSet = await authModel.setOtp({user_id:user_id,otp_code:otp_code});
+        
+        if(isSet.resault=="user_id"){
+            return res.status(401).json({message:'NO_USER'});
+        }
+        if(isSet.email){
+            try {
+                await sendOtpEmail({ to: isSet.email, otpCode: otp_code });
+            } catch (emailErr) {
+                console.error('Email send failed:', emailErr);
+                // Continue with verification even if email fails
+            }
+            return res.status(201).json({message:'OTP_SET'});
+        }
+        return res.status(500).json({message:'SERVER_ERROR'});
+
+    }catch(err){
+        return res.status(500).json({message:'SERVER_ERROR'});
+
+    };
+
 };

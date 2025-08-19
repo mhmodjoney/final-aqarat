@@ -4,68 +4,42 @@ const Joi = require('joi');
 // Registration validation schema
 const registrationSchema = Joi.object({
   // Required fields
-  fullName: Joi.string()
-    .min(3)
-    .max(100)
-    // if the full name is required or not 
-    // .required()
-    .messages({
-      'string.min': 'يجب أن يكون الاسم الكامل 3 أحرف على الأقل',
-      'string.max': 'يجب أن يكون الاسم الكامل أقل من 100 حرف',
-      'any.required': 'الاسم الكامل مطلوب'
-    }),
-
+  
   userName: Joi.string()
     .min(3)
     .max(50)
     .pattern(/^[a-zA-Z0-9_]+$/)
     .required()
     .messages({
-      'string.pattern.base': 'يجب أن يحتوي اسم المستخدم على أحرف وأرقام وشرطة سفلية فقط',
-      'string.min': 'يجب أن يكون اسم المستخدم 3 أحرف على الأقل',
-      'string.max': 'يجب أن يكون اسم المستخدم أقل من 50 حرف',
-      'any.required': 'اسم المستخدم مطلوب'
+      'string.pattern.base': 'USERNAME_PATTERN',
+      'string.min': 'USERNAME_MIN',
+      'string.max': 'USERNAME_MAX',
+      'any.required': 'USERNAME_REQUIRED'
     }),
 
   password: Joi.string()
     .min(6)
     .required()
     .messages({
-      'string.min': 'يجب أن تكون كلمة المرور 6 أحرف على الأقل',
-      'any.required': 'كلمة المرور مطلوبة'
+      'string.min': 'PASSWORD_MIN',
+      'any.required': 'PASSWORD_REQUIRED'
     }),
 
   phoneNum: Joi.string()
     .pattern(/^09\d{8}$/)
     .required()
     .messages({
-      'string.pattern.base': 'يجب أن يبدأ رقم الهاتف بـ 09 وأن يكون 10 أرقام بالضبط',
-      'any.required': 'رقم الهاتف مطلوب'
+      'string.pattern.base': 'PHONE_PATTERN',
+      'any.required': 'PHONE_REQUIRED'
     }),
 
   email: Joi.string()
     .email()
     .required()
     .messages({
-      'string.email': 'يرجى إدخال بريد إلكتروني صحيح',
-      'any.required': 'البريد الإلكتروني مطلوب'
+      'string.email': 'EMAIL_INVALID',
+      'any.required': 'EMAIL_REQUIRED'
     }),
-
-  type: Joi.string()
-    .valid('user', 'admin', 'agent')
-    .required()
-    .messages({
-      'any.only': 'يجب أن يكون النوع مستخدم أو مدير أو وكيل',
-      'any.required': 'النوع مطلوب'
-    }),
-
-  // Optional field
-  whatsappNum: Joi.string()
-    .pattern(/^09\d{8}$/)
-    .optional()
-    .messages({
-      'string.pattern.base': 'يجب أن يبدأ رقم الواتساب بـ 09 وأن يكون 10 أرقام بالضبط'
-    })
 });
 
 // Login validation schema
@@ -73,26 +47,21 @@ const loginSchema = Joi.object({
   email: Joi.string()
     .required()
     .messages({
-      'string.email': 'يرجى إدخال بريد إلكتروني صحيح',
-      'any.required': 'البريد الإلكتروني أو اسم المستخدم أو رقم الهاتف مطلوب'
+      'any.required': 'LOGIN_EMAIL_REQUIRED'
     }),
 
   password: Joi.string()
     .required()
     .messages({
-      'any.required': 'كلمة المرور مطلوبة'
+      'any.required': 'PASSWORD_REQUIRED'
     })
 });
 
-// Verify OTP schema
+// Verify OTP schema NEED EDITSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
 const verifyOtpSchema = Joi.object({
-  email: Joi.string().email().required().messages({
-    'string.email': 'يرجى إدخال بريد إلكتروني صحيح',
-    'any.required': 'البريد الإلكتروني مطلوب'
-  }),
   otp_code: Joi.string().pattern(/^\d{6}$/).required().messages({
-    'string.pattern.base': 'رمز التحقق يجب أن يكون 6 أرقام',
-    'any.required': 'رمز التحقق مطلوب'
+    'string.pattern.base': 'OTP_PATTERN',
+    'any.required': 'OTP_REQUIRED'
   })
 });
 
@@ -109,7 +78,7 @@ const validateRequest = (schema) => {
         message: detail.message
       }));
       return res.status(400).json({
-        message: 'فشل في التحقق من صحة البيانات',
+        message: 'VALIDATION_FAILED',
         errors: errorMessage
       });
     }

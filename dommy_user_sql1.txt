@@ -1,9 +1,0 @@
-{
-  "fullName": "John Doe",
-  "userName": "username22",
-  "password": "password2",
-  "phoneNum": "01234567890",
-  "whatsappNum": "01234567890",
-  "email": "john.doedn@example2.com",
-  "type": "user"
-}

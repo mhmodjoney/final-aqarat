@@ -23,20 +23,20 @@ exports.create = async (req,res)=>{
     const authed = await getUserIdFromToken(req);
     
     if(!authed)
-      return req.status(401).json({message:'غير مصرح'});
+      return req.status(401).json({message:'UNAUTHORIZED'});
 //  this one is not created yet
     const resault=await realEstateModel.create({estateData:{title,description,price,currency,city,region,type,purpose},owner:authed});
     if(resault.notActiv){
-      return res.status(401).json({message:'تم تقييد حسابك تواصل مع الدعم لتفعيله'});
+      return res.status(401).json({message:'ACCOUNT_RESTRICTED'});
     }else if(resault.noAccount){
-      return res.status(401).json({message:'انشئ حساب لانشاء عقارات او قم بتسجيل الدخول مرة اخرى'});
+      return res.status(401).json({message:'NO_ACCOUNT'});
     }else if(resault.created){
-      return res.status(201).json({message:'تم إنشاء العقار بنجاح'});
+      return res.status(201).json({message:'ESTATE_CREATED'});
     }else{
-      return res.status(500).json({message:'خطأ في الخادم',err:err});
+      return res.status(500).json({message:'SERVER_ERROR',err:err});
     };
   }catch(err){
-    return res.status(500).json({message:'خطأ في الخادم',err:err});
+    return res.status(500).json({message:'SERVER_ERROR',err:err});
   };
 
 };
@@ -46,9 +46,9 @@ exports.searchRealEstate = async (req, res) => {
   try {
     const filters = req.body; 
     const results = await realEstateModel.getRealEstate(filters);
-    return res.status(200).json({message:'نتائج البحث',data:{results}});
+    return res.status(200).json({message:'SEARCH_RESULTS',data:{results}});
   } catch (err) {
-    return res.status(500).json({ message: 'خطأ في الخادم',data:{err:err}});
+    return res.status(500).json({ message: 'SERVER_ERROR',data:{err:err}});
   };
   
 };
@@ -58,21 +58,21 @@ exports.delete = async (req,res)=>{
     const {real_estate_id}=req.body;
     const user_id=getUserIdFromToken(req);
     if(!user_id)
-      return res.status(401).json({message:'غير مصرح'})
+      return res.status(401).json({message:'UNAUTHORIZED'})
     const resault=realEstateModel.delete({user_id:user_id,real_estate_id:real_estate_id});
     if(resault.notActiv){
-      return res.status(401).json({message:'تم تقييد حسابك تواصل مع الدعم لتفعيله'});
+      return res.status(401).json({message:'ACCOUNT_RESTRICTED'});
     }else if(resault.noAccount){
-      return res.status(401).json({message:'انشئ حساب لانشاء عقارات او قم بتسجيل الدخول مرة اخرى'});
+      return res.status(401).json({message:'NO_ACCOUNT'});
     }else if (resault.notOwnd){
-      return res.status(401).json({message:'العقار ليس ملكك لتقوم بحذفه'});
+      return res.status(401).json({message:'NOT_OWNER'});
     }else if(resault.deleted){
-      return res.status(201).json({message:'تم حذف العقار بنجاح'});
+      return res.status(201).json({message:'ESTATE_DELETED'});
     }else{
-      return res.status(500).json({message:'خطأ في الخادم',err:err});
+      return res.status(500).json({message:'SERVER_ERROR'});
     };
   } catch (err) {
-    return res.status(500).json({ message: 'خطأ في الخادم',data:{err:err} });
+    return res.status(500).json({ message: 'SERVER_ERROR',data:{err:err} });
   };
 };
 
