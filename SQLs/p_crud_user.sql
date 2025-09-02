@@ -1,4 +1,4 @@
-CREATE PROCEDURE `railway`.`sp_crud_user`(
+CREATE PROCEDURE `db`.`sp_crud_user`(
 	IN p_action VARCHAR(10),
 	IN p_user_id INT,
 	IN p_full_name VARCHAR(100),
@@ -14,13 +14,12 @@ CREATE PROCEDURE `railway`.`sp_crud_user`(
 	IN p_created_date DATETIME,
 	IN p_updated_date DATETIME,
 	IN p_otp_code VARCHAR(10),
-	IN p_otp_expires_at DATETIME)
-    
-    BEGIN
-        DECLARE v_otp_code VARCHAR(10) DEFAULT NULL ;
+	IN p_otp_expires_at DATETIME
+)
+BEGIN
+        DECLARE v_otp_code VARCHAR(10) DEFAULT NULL;
         DECLARE v_otp_expires_at DATETIME DEFAULT NULL;
-        DECLARE v_state VARCHAR(50);
-
+        DECLARE v_state VARCHAR(50) default NULL;
         DECLARE email_count INT DEFAULT 0;
         DECLARE username_count INT DEFAULT 0;
         DECLARE phone_count INT DEFAULT 0;
@@ -28,9 +27,9 @@ CREATE PROCEDURE `railway`.`sp_crud_user`(
 
         IF p_action = 'update' THEN
             
-            SELECT COUNT(*) INTO email_count WHERE `email`=p_email AND user_id !=p_user_id;
-            SELECT COUNT(*) INTO username_count WHERE `user_name`=p_user_name AND user_id !=p_user_id;
-            SELECT COUNT(*) INTO phone_count WHERE `phone_number`=p_phone_number AND user_id !=p_user_id;
+            SELECT COUNT(*) INTO email_count FROM `user` WHERE `email`=p_email AND user_id !=p_user_id;
+            SELECT COUNT(*) INTO username_count FROM `user` WHERE `user_name`=p_user_name AND user_id !=p_user_id;
+            SELECT COUNT(*) INTO phone_count FROM `user` WHERE `phone_number`=p_phone_number AND user_id !=p_user_id;
             IF (email_count > 0) THEN 
                 SELECT "email" AS resault;
             ELSEIF (username_count > 0) THEN
@@ -143,4 +142,4 @@ CREATE PROCEDURE `railway`.`sp_crud_user`(
             SELECT * FROM `user` WHERE (`user_id`=p_user_id);
         
         END IF;
-    END
+END

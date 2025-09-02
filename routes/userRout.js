@@ -1,9 +1,10 @@
 const express =require('express');
 const router = express.Router();
 const userController= require('../controllers/userController');
-// here are auth routs will be...
-// router.post('/profile'  ,userController.profile);
-router.post('/update'   ,userController.update);
-router.post('/delete'   ,userController.delete);
+const { updateSchema, deleteSchema, validateRequest } = require('../middlewares/userValidaters');
+
+router.post('/update', validateRequest(updateSchema), userController.update);
+router.post('/delete',                                userController.delete);
+
 
 module.exports = router;

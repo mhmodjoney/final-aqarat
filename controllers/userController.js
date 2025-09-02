@@ -1,5 +1,6 @@
 const userModel =require('../models/userModel');
 const jwt =require('jsonwebtoken');
+const bcrypt= require("bcrypt");
 
 function getUserIdFromToken(req) {
     // 1. Get the token from the Authorization header
@@ -20,20 +21,20 @@ function getUserIdFromToken(req) {
 };
 
 exports.delete = async(req,res)=>{
-    console.log('delete acc');
+    console.log('/user/delete');
     
     try{
         const user_id=getUserIdFromToken(req);
         if(!user_id){
             return res.status(401).json({message:'UNAUTHORIZED'});
         }
-        
         const deleted = await userModel.delete({user_id:user_id});
         // console.log(user_id);
         if(deleted.resault=="user_id"){
             return res.status(401).json({message:'NO_USER'});
         }
-        return res.status(201).json({message:"ACC_DELETED"});
+        if (deleted.resault=="deleted")
+            return res.status(201).json({message:"ACC_DELETED"});
     }catch(err){       
         console.log(err);
         return res.status(500).json({message:"SERVER_ERROR",data:{err:err}})    
@@ -41,13 +42,20 @@ exports.delete = async(req,res)=>{
 };
 
 exports.update = async(req,res)=>{
+    console.log('/user/update');
+    
     try{
-        const {full_name, phone_number, whatsapp_number, email, user_name, password}=req.body;
+        const {fullName, phoneNumber, whatsappNumber, email, userName, password}=req.body;
         const user_id = getUserIdFromToken(req);
         if(!user_id){
             return res.status(401).json({message:'UNAUTHORIZED'});
         }
-        let user = await userModel.update({user_id:user_id,full_name:full_name,phone_number:phone_number, whatsapp_number: whatsapp_number, email: email, user_name: user_name, password: password})
+        let hashed =null
+        if (password){
+            hashed =await bcrypt.hash(password,10);
+        }
+        let user = await userModel.update({user_id:user_id,full_name:fullName,phone_number:phoneNumber, whatsapp_number: whatsappNumber, email: email, user_name: userName, password: hashed})
+        
         if(user.resault=='email'){
             return res.status(400).json({message:"EMAIL_EXIST"});
         }
@@ -57,17 +65,23 @@ exports.update = async(req,res)=>{
         if(user.resault=='phone_number'){
             return res.status(400).json({message:"PHONE_EXISTS"});
         }
+        if(user.resault=='user_id'){
+            return res.status(400).json({message:"NO_USER"});
+        }
+        
         delete user.password;
         delete user.otp_code;
         delete user.otp_expires_at;
-        return res.status(201).json({message:"ACC_UPDATED",data:{user:user}})
+        const token =jwt.sign({id:user.user_id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRESIN || '1d'})
+        return res.status(201).json({message:"ACC_UPDATED",data:{user:user,token:token}})
     }catch(err){
         console.log(err);
-        return res.status(500).json({message:"message"});
+        return res.status(500).json({message:"SERVERE_ERROR"});
     };
 };
 
 exports.profile = async(req,res)=>{
+    console.log('/user/profile');
     try{
         const user_id = getUserIdFromToken(req);
         if(!user_id){

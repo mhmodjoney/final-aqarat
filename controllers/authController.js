@@ -95,12 +95,12 @@ exports.otpVerification = async(req,res)=>{
     console.log('verify');
     
     try{
-        const {otp_code}=req.body;
+        const {otpCode}=req.body;
         const user_id=getUserIdFromToken(req);
         if(!user_id){
             return res.status(401).json({message:'UNAUTHORIZED'});
         };
-        let user= await authModel.verifyOtpById({user_id:user_id,otp_code:otp_code});
+        let user= await authModel.verifyOtpById({user_id:user_id,otp_code:otpCode});
         if(user.resault=="user_id"){
             return res.status(404).json({message:'NO_USER'});
         }
@@ -116,7 +116,9 @@ exports.otpVerification = async(req,res)=>{
         delete user.password;
         delete user.otp_code;
         delete user.otp_expires_at;
-        return res.status(201).json({message:'ACTIVATED_ACC',data:{user:user}});
+        const token =jwt.sign({id:user.user_id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRESIN || '1d'})
+
+        return res.status(201).json({message:'ACTIVATED_ACC',data:{user:user,token:token}});
 
     }catch(err){
         return res.status(500).json({message:'SERVER_ERROR',data:{err:err}});
@@ -126,19 +128,19 @@ exports.otpVerification = async(req,res)=>{
 exports.setOtp = async(req,res)=>{
     console.log('set OTP');
     try{
-        const{otp_code}=req.body;
+        const{otpCode}=req.body;
         const user_id=getUserIdFromToken(req);
+        // console.log(user_id);
         if(!user_id){
             return res.status(401).json({message:'UNAUTHORIZED'});
         }
-        const isSet = await authModel.setOtp({user_id:user_id,otp_code:otp_code});
-        
+        const isSet = await authModel.setOtp({user_id:user_id,otp_code:otpCode});
         if(isSet.resault=="user_id"){
             return res.status(401).json({message:'NO_USER'});
         }
         if(isSet.email){
             try {
-                await sendOtpEmail({ to: isSet.email, otpCode: otp_code });
+                await sendOtpEmail({ to: isSet.email, otpCode: otpCode });
             } catch (emailErr) {
                 console.error('Email send failed:', emailErr);
                 // Continue with verification even if email fails

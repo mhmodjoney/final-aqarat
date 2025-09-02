@@ -1,69 +1,69 @@
-// middlewares/authValidator.js
+// middlewares/userValidaters.js
 const Joi = require('joi');
 
-// Registration validation schema
-const registrationSchema = Joi.object({
-  // Required fields
-  
-  userName: Joi.string()
+// Update user validation schema
+const updateSchema = Joi.object({
+    fullName: Joi.string()
+    .min(3)
+    .max(50)
+    .pattern(/^[\u0600-\u06FFa-zA-Z\s]+$/)
+    .optional()
+    .messages({
+      'string.pattern.base': 'FULLNAME_PATTERN',
+      'string.min': 'FULLNAME_MIN',
+      'string.max': 'FULLNAME_MAX',
+    }),
+
+    userName: Joi.string()
     .min(3)
     .max(50)
     .pattern(/^[a-zA-Z0-9_]+$/)
-    .required()
+    .optional()
     .messages({
       'string.pattern.base': 'USERNAME_PATTERN',
       'string.min': 'USERNAME_MIN',
       'string.max': 'USERNAME_MAX',
-      'any.required': 'USERNAME_REQUIRED'
     }),
 
-  password: Joi.string()
+    password: Joi.string()
     .min(6)
-    .required()
+    .optional()
     .messages({
       'string.min': 'PASSWORD_MIN',
-      'any.required': 'PASSWORD_REQUIRED'
     }),
 
   phoneNum: Joi.string()
     .pattern(/^09\d{8}$/)
-    .required()
+    .optional()
     .messages({
       'string.pattern.base': 'PHONE_PATTERN',
-      'any.required': 'PHONE_REQUIRED'
     }),
 
   email: Joi.string()
     .email()
-    .required()
+    .optional()
     .messages({
       'string.email': 'EMAIL_INVALID',
-      'any.required': 'EMAIL_REQUIRED'
     }),
 });
 
-// Login validation schema
-const loginSchema = Joi.object({
-  email: Joi.string()
-    .required()
-    .messages({
-      'any.required': 'LOGIN_EMAIL_REQUIRED'
-    }),
+// Delete user validation schema
+// const deleteSchema = Joi.object({
+//   userId: Joi.string()
+//     .required()
+//     .messages({
+//       'any.required': 'USER_ID_REQUIRED'
+//     })
+// });
 
-  password: Joi.string()
-    .required()
-    .messages({
-      'any.required': 'PASSWORD_REQUIRED'
-    })
-});
-
-// Verify OTP schema NEED EDITSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
-const verifyOtpSchema = Joi.object({
-  otpCode: Joi.string().pattern(/^\d{6}$/).required().messages({
-    'string.pattern.base': 'OTP_PATTERN',
-    'any.required': 'OTP_REQUIRED'
-  })
-});
+// Get user validation schema
+// const getUserSchema = Joi.object({
+//   userId: Joi.string()
+//     .optional()
+//     .messages({
+//       'string.base': 'USER_ID_INVALID'
+//     })
+// });
 
 // Reusable validation middleware
 const validateRequest = (schema) => {
@@ -88,8 +88,8 @@ const validateRequest = (schema) => {
 };
 
 module.exports = {
-  registrationSchema,
-  loginSchema,
-  verifyOtpSchema,
+  updateSchema,
+  // deleteSchema,
+  // getUserSchema,
   validateRequest
 };

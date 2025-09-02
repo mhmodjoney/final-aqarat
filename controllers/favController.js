@@ -1,7 +1,6 @@
 const favModel=require("../models/favModel");
 const jwt =require('jsonwebtoken');
 
-
 function getUserIdFromToken(req) {
     // 1. Get the token from the Authorization header
     const authHeader = req.headers['authorization'];
@@ -40,7 +39,16 @@ exports.add= async (req,res)=> {
 
 };
 exports.list= async (req,res)=> {
-    
+    try{
+        const user_id =getUserIdFromToken(req);
+        if(!user_id){
+            return res.status(401).json({message:'UNAUTHORIZED'});    
+        }
+        const favList=await favModel.list({user_id:user_id});
+        
+    }catch(err){
+        return res.status(500).json({message:'SERVER_ERROR',data:{err:err}})
+    };
 
 };
 exports.remove= async (req,res)=> {
