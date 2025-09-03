@@ -1,7 +1,7 @@
 const express =require('express');
 const router = express.Router();
 const userController= require('../controllers/userController');
-const { updateSchema, deleteSchema, validateRequest } = require('../middlewares/userValidaters');
+const { updateSchema, validateRequest } = require('../middlewares/userValidaters');
 
 router.post('/update', validateRequest(updateSchema), userController.update);
 router.post('/delete',                                userController.delete);

@@ -21,7 +21,7 @@ function getUserIdFromToken(req) {
 };
 
 exports.create = async(req,res )=>{
-    console.log('create');
+    console.log('/auth/create');
     try{
         const {userName,password,phoneNum,email}=req.body;
         // console.log({fullName,userName,password,phoneNum,whatsappNum,email,type});
@@ -51,7 +51,7 @@ exports.create = async(req,res )=>{
 };
 
 exports.login = async (req,res)=>{
-    console.log('login');
+    console.log('/auth/login');
     try{
         const {email,password}=req.body;
         let user= await authModel.login({email:email})
@@ -86,13 +86,13 @@ exports.login = async (req,res)=>{
 
 exports.logout = async (req, res) => {
     // console.log(req.body);
-    console.log('logout');
+    console.log('/auth/logout');
 
     return res.status(200).json({ message: "LOGED_OUT" });
 };
 
 exports.otpVerification = async(req,res)=>{
-    console.log('verify');
+    console.log('/auth/verify-otp');
     
     try{
         const {otpCode}=req.body;
@@ -126,7 +126,7 @@ exports.otpVerification = async(req,res)=>{
 };
 
 exports.setOtp = async(req,res)=>{
-    console.log('set OTP');
+    console.log('/auth/set-otp');
     try{
         const{otpCode}=req.body;
         const user_id=getUserIdFromToken(req);
