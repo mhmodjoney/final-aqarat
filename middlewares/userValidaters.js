@@ -3,38 +3,42 @@ const Joi = require('joi');
 
 // Update user validation schema
 const updateSchema = Joi.object({
-    fullName: Joi.string()
+  fullName: Joi.string()
     .min(3)
     .max(50)
-    .pattern(/^[\u0600-\u06FFa-zA-Z\s]+$/)
+    .pattern(/^[\u0600-\u06FFa-zA-Z\s-]+$/)
     .optional()
+    .allow('', null).default(null)
     .messages({
       'string.pattern.base': 'FULLNAME_PATTERN',
       'string.min': 'FULLNAME_MIN',
       'string.max': 'FULLNAME_MAX',
     }),
 
-    userName: Joi.string()
+  userName: Joi.string()
     .min(3)
     .max(50)
     .pattern(/^[a-zA-Z0-9_]+$/)
     .optional()
+    .allow('', null).default(null)
     .messages({
       'string.pattern.base': 'USERNAME_PATTERN',
       'string.min': 'USERNAME_MIN',
       'string.max': 'USERNAME_MAX',
     }),
 
-    password: Joi.string()
+  password: Joi.string()
     .min(6)
     .optional()
+    .allow('', null).default(null)
     .messages({
       'string.min': 'PASSWORD_MIN',
     }),
 
-  phoneNum: Joi.string()
+  phoneNumber: Joi.string()
     .pattern(/^09\d{8}$/)
     .optional()
+    .allow('', null).default(null)
     .messages({
       'string.pattern.base': 'PHONE_PATTERN',
     }),
@@ -42,9 +46,21 @@ const updateSchema = Joi.object({
   email: Joi.string()
     .email()
     .optional()
+    .allow('', null).default(null)
     .messages({
       'string.email': 'EMAIL_INVALID',
     }),
+
+  whatsappNumber: Joi.string()
+    .pattern(/^09\d{8}$/)
+    .optional()
+    .allow('', null).default(null)
+    .messages({
+      'string.pattern.base': 'WHATS_PATTERN',
+    }),
+
+
+
 });
 
 // Delete user validation schema

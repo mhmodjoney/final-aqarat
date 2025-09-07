@@ -1,5 +1,5 @@
 const { Result } = require('express-validator');
-const pool = require('../config/dbconfig');
+const pool = require('../config/dbcfg');
 
 
 

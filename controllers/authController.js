@@ -21,7 +21,7 @@ function getUserIdFromToken(req) {
 };
 
 exports.create = async(req,res )=>{
-    console.log('/auth/create');
+    console.log('create');
     try{
         const {userName,password,phoneNum,email}=req.body;
         // console.log({fullName,userName,password,phoneNum,whatsappNum,email,type});
@@ -51,7 +51,7 @@ exports.create = async(req,res )=>{
 };
 
 exports.login = async (req,res)=>{
-    console.log('/auth/login');
+    console.log('login');
     try{
         const {email,password}=req.body;
         let user= await authModel.login({email:email})
@@ -86,13 +86,13 @@ exports.login = async (req,res)=>{
 
 exports.logout = async (req, res) => {
     // console.log(req.body);
-    console.log('/auth/logout');
+    console.log('logout');
 
     return res.status(200).json({ message: "LOGED_OUT" });
 };
 
 exports.otpVerification = async(req,res)=>{
-    console.log('/auth/verify-otp');
+    console.log('verify');
     
     try{
         const {otpCode}=req.body;
@@ -116,9 +116,7 @@ exports.otpVerification = async(req,res)=>{
         delete user.password;
         delete user.otp_code;
         delete user.otp_expires_at;
-        const token =jwt.sign({id:user.user_id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRESIN || '1d'})
-
-        return res.status(201).json({message:'ACTIVATED_ACC',data:{user:user,token:token}});
+        return res.status(201).json({message:'ACTIVATED_ACC',data:{user:user}});
 
     }catch(err){
         return res.status(500).json({message:'SERVER_ERROR',data:{err:err}});
@@ -126,15 +124,15 @@ exports.otpVerification = async(req,res)=>{
 };
 
 exports.setOtp = async(req,res)=>{
-    console.log('/auth/set-otp');
+    console.log('set OTP');
     try{
         const{otpCode}=req.body;
         const user_id=getUserIdFromToken(req);
-        // console.log(user_id);
         if(!user_id){
             return res.status(401).json({message:'UNAUTHORIZED'});
         }
         const isSet = await authModel.setOtp({user_id:user_id,otp_code:otpCode});
+        
         if(isSet.resault=="user_id"){
             return res.status(401).json({message:'NO_USER'});
         }

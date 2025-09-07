@@ -4,7 +4,7 @@ const realEstateRout = require('./realRout');
 const authRout =require('./authRout')
 // const favRout =require('./favRout')
 const userRout =require('./userRout')
-
+const imageRout=require('./imageRout')
 
 
 
@@ -13,4 +13,5 @@ router.use('/realestate', realEstateRout);
 router.use('/auth',authRout);
 // router.use('/fav',favRout);
 router.use('/user',userRout);
+router.use('/image',imageRout);
 module.exports = router;

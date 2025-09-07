@@ -45,7 +45,9 @@ exports.update = async(req,res)=>{
     console.log('/user/update');
     
     try{
-        const {fullName, phoneNumber, whatsappNumber, email, userName, password}=req.body;
+        const {fullName=null, phoneNumber=null, whatsappNumber=null, email=null, userName=null, password=null}=req.body;
+        // console.log({fullName, phoneNumber, whatsappNumber, email, userName, password});
+        
         const user_id = getUserIdFromToken(req);
         if(!user_id){
             return res.status(401).json({message:'UNAUTHORIZED'});
@@ -54,6 +56,8 @@ exports.update = async(req,res)=>{
         if (password){
             hashed =await bcrypt.hash(password,10);
         }
+        // console.log(whatsappNumber);
+        
         let user = await userModel.update({user_id:user_id,full_name:fullName,phone_number:phoneNumber, whatsapp_number: whatsappNumber, email: email, user_name: userName, password: hashed})
         
         if(user.resault=='email'){
@@ -83,14 +87,24 @@ exports.update = async(req,res)=>{
 exports.profile = async(req,res)=>{
     console.log('/user/profile');
     try{
+        const {user_name} =req.body
         const user_id = getUserIdFromToken(req);
-        if(!user_id){
-            return res.status(401).json({message:'UNAUTHORIZED'});
+        let user;
+        if (user_name){
+            user = await userModel.profileUserName({user_name:user_name})
         }
-        let user = await userModel.profile({user_id:user_id});
+        else if (user_id){
+            user = await userModel.profileId({user_id:user_id});
+        }else{
+            return res.status(401).json({message:"UNAUTHORIZED"});
+        }
         if(user.resault=="user_id"){
             return res.status(404).json({message:"NO_USER"});
         }
+        if(user.resault=="user_name"){
+            return res.status(404).json({message:"NO_USER"});
+        }
+        
         delete user.password;
         delete user.otp_code;
         delete user.otp_expires_at;

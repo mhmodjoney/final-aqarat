@@ -1,4 +1,4 @@
-const pool = require('../config/dbconfig');
+const pool = require('../config/dbcfg');
 // Functions for useing
 function getMySQLDateTimeNow() {
   const now = new Date();
