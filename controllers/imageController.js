@@ -2,25 +2,12 @@ const uploadImage  = require('../utils/cloudinaryUploade');
 
 const uploadImageController = async (req, res) => {
     try {
-        if (!req.file || !req.file.buffer) {
-            return res.status(400).json({ error: 'NO_FILE' });
-        }
-
-        // Optional: Validate file type and size here
-        // Optional: Sanitize buffer if needed
-        // const safeBuffer = await sanitizeImageBuffer(req.file.buffer);
-
+        console.log('/upload-image');
         const result = await uploadImage(req.file.buffer);
-
-        return res.json({
-            url: result.secure_url,
-            width: result.width,
-            height: result.height,
-            bytes: result.bytes,
-        });
+        return res.status(201).json({ message: 'UPLOAD_SUCCESS', data: result });
     } catch (err) {
-        return res.status(400).json({ error:err || 'SERVER_ERROR' });
+        return res.status(500).json({ message: 'UPLOAD_FAILED', error: err.message });
     }
 };
 
-module.exports = { uploadImageController };
+module.exports = uploadImageController;

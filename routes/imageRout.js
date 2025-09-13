@@ -1,11 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const uploadImageController  = require('../controllers/imageController'); // Adjust path as needed
-const ensureAuth = require('../middlewares/authMiddleware'); // Adjust path as needed
+const uploadImageController  = require('../controllers/imageController');
+const ensureAuth = require('../middlewares/authMiddleware');
+const { uploadSingle, validateImage } = require('../middlewares/uploadMiddleware');
 
-const upload = multer();
+router.post('/upload-image', ensureAuth, uploadSingle, validateImage, uploadImageController);
 
-router.post('/upload-image', ensureAuth, upload.single('image'), uploadImageController.uploadImageController);
+router.use((err, req, res, next) => {
+  const multer = require('multer');
+  if (err instanceof multer.MulterError) {
+    console.log('Multer error:', err);
+    return res.status(400).json({ message: 'INVALID_FILE_UPLOAD', code: err.code });
+  }
+  if (err) {
+    return res.status(500).json({ message: 'UPLOAD_ERROR', error: err.message });
+  }
+  next();
+});
 
 module.exports = router;
