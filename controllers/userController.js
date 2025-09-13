@@ -25,9 +25,6 @@ exports.delete = async(req,res)=>{
     
     try{
         const user_id=getUserIdFromToken(req);
-        if(!user_id){
-            return res.status(401).json({message:'UNAUTHORIZED'});
-        }
         const deleted = await userModel.delete({user_id:user_id});
         // console.log(user_id);
         if(deleted.resault=="user_id"){
@@ -49,9 +46,6 @@ exports.update = async(req,res)=>{
         // console.log({fullName, phoneNumber, whatsappNumber, email, userName, password});
         
         const user_id = getUserIdFromToken(req);
-        if(!user_id){
-            return res.status(401).json({message:'UNAUTHORIZED'});
-        }
         let hashed =null
         if (password){
             hashed =await bcrypt.hash(password,10);

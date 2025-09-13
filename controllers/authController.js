@@ -97,9 +97,7 @@ exports.otpVerification = async(req,res)=>{
     try{
         const {otpCode}=req.body;
         const user_id=getUserIdFromToken(req);
-        if(!user_id){
-            return res.status(401).json({message:'UNAUTHORIZED'});
-        };
+        
         let user= await authModel.verifyOtpById({user_id:user_id,otp_code:otpCode});
         if(user.resault=="user_id"){
             return res.status(404).json({message:'NO_USER'});
@@ -128,9 +126,6 @@ exports.setOtp = async(req,res)=>{
     try{
         const{otpCode}=req.body;
         const user_id=getUserIdFromToken(req);
-        if(!user_id){
-            return res.status(401).json({message:'UNAUTHORIZED'});
-        }
         const isSet = await authModel.setOtp({user_id:user_id,otp_code:otpCode});
         
         if(isSet.resault=="user_id"){

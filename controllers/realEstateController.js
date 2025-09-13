@@ -40,9 +40,8 @@ exports.create = async (req, res) => {
     
     const user_id = await getUserIdFromToken(req);
     
-    if(!user_id)
-      return req.status(401).json({message:'UNAUTHORIZED'});
 
+    
     const result = await realEstateModel.create({
       title,
       description,
@@ -94,8 +93,6 @@ exports.delete = async (req, res) => {
     const { real_estate_id } = req.body;
     const user_id = getUserIdFromToken(req);
     
-    if (!user_id)
-      return res.status(401).json({ message: 'UNAUTHORIZED' });
 
     const result = await realEstateModel.delete({ user_id, real_estate_id });
     console.log('Delete result:', result); // Debugging line
@@ -128,9 +125,6 @@ exports.myestate = async (req, res) => {
     
     const user_id = getUserIdFromToken(req);
     
-    if (!user_id)
-      return res.status(401).json({ message: 'UNAUTHORIZED' });
-
     const results = await realEstateModel.getByOwner(user_id);
     if(results.resault=='user_id'){
       return res.status(400).json({message:"NO_USER"});
@@ -166,9 +160,6 @@ exports.update = async (req, res) => {
     } = req.body;
     
     const user_id = getUserIdFromToken(req);
-    
-    if (!user_id)
-      return res.status(401).json({ message: 'UNAUTHORIZED' });
 
     const result = await realEstateModel.update({
       real_estate_id,

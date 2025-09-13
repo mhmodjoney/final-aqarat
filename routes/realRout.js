@@ -9,6 +9,6 @@ router.post('/create', validateRequest(createEstateSchema), ensureAuth,realContr
 router.post('/search', validateRequest(searchEstateSchema), realController.searchRealEstate);
 router.post('/delete', validateRequest(deleteEstateSchema), ensureAuth,realController.delete);
 router.post('/update', validateRequest(updateEstateSchema), ensureAuth,realController.update);
-router.post('/myestate',realController.myestate);
+router.post('/myestate',                                    ensureAuth,realController.myestate);
 
 module.exports = router;
