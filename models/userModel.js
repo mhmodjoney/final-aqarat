@@ -1,10 +1,5 @@
 const pool = require('../config/dbcfg');
 
-function getMySQLDateTimeNow() {
-  const now = new Date();
-  return now.toISOString().slice(0, 19).replace('T', ' ');
-};
-
 exports.delete = async (fields) => {
 
   //p_action, p_user_id, p_full_name, p_phone_number, p_whatsapp_number, p_email, p_user_name, p_password, p_type, p_state, p_created_by, p_last_updated_by, p_created_date, p_updated_date p_otp_code p_otp_expires_at

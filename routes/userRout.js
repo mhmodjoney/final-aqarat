@@ -6,6 +6,7 @@ const ensureAuth = require('../middlewares/authMiddleware');
 
 router.post('/update', validateRequest(updateSchema), ensureAuth,userController.update);
 router.post('/delete',                                ensureAuth,userController.delete);
+router.post('/profile',userController.profile);
 
 
 module.exports = router;
